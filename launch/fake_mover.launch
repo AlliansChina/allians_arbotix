@@ -1,0 +1,21 @@
+<launch>
+
+  <param name="use_sim_time" value="false" />
+  <include file="$(find allians_arbotix)/launch/display.launch"/>
+  
+  <arg name="robotname" value="mover"/>
+  <arg name="localplanner" value="base"/>
+  
+  t<arg name="map" default="bgs.yaml" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find allians_arbotix)/maps/$(arg map)"/>
+
+  <include file="$(find allians_arbotix)/config/$(arg robotname)/navigation/$(arg localplanner)_local_planner/$(arg robotname)_$(arg localplanner)_move_base.launch" />
+  <include file="$(find allians_arbotix)/config/$(arg robotname)/amcl/launch/$(arg robotname)_amcl.launch"/>
+  <!-- Run fake localization compatible with AMCL output -->
+  <node pkg="fake_localization" type="fake_localization" name="fake_localization" clear_params="true" output="screen">
+     <remap from="base_pose_ground_truth" to="odom" />
+     <param name="global_frame_id" value="map" />
+     <param name="base_frame_id" value="base_link" />
+  </node>
+
+</launch>
